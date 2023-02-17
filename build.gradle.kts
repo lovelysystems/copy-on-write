@@ -1,27 +1,12 @@
 plugins {
-    kotlin("jvm") version "1.8.0"
-    application
+    id("com.lovelysystems.gradle") version ("1.11.3")
 }
 
-group = "ls.copy-on-write"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-kotlin {
-    jvmToolchain(8)
-}
-
-application {
-    mainClass.set("MainKt")
+lovely {
+    gitProject()
+    dockerProject(
+        "lovelysystems/copy-on-write",
+    ) {
+        from("docker")
+    }
 }
