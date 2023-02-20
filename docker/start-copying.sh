@@ -65,13 +65,20 @@ do
   mkdir -p "$targetPath"
 done
 
-inotifywait -mr "$SOURCE_ROOT" -e create -e moved_to |
+function fileEventHandling {
+  dir=$1
+  action=$2
+  file=$3
+}
+
+inotifywait -mr "$SOURCE_ROOT" -e moved_to,create |
   while read -r dir action file; do
+    echo "$action $dir$file"
     fullSourcePath="$dir$file"
     echo "getting output for $dir$file"
     targetPath=$(getOutputPath "$dir" "$file")
 
-    #TODO if new folder is read, reestablish listeners for that folder
+    #TODO if new folder is read, make sure those folders are also watched for that folder
     if [[ -z "$targetPath" ]];
     then
       echo "No matching pair found. Ignoring"
@@ -81,8 +88,8 @@ inotifywait -mr "$SOURCE_ROOT" -e create -e moved_to |
         echo "copying to $targetPath"
         cp -p "$fullSourcePath" "$targetPath"
       elif [[ -d $fullSourcePath ]]; then
-        echo "creating directory $fullSourcePath"
-        mkdir -p "$fullSourcePath"
+        inotifywait -mr "$fullSourcePath" -e moved_to,create | /dev/null
+        echo "watch for $fullSourcePath created (hopefully)"
       fi
     fi
   done
