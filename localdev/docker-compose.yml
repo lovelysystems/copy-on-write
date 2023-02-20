@@ -10,9 +10,3 @@ services:
     volumes:
       - ./../playground/sandbox/src:/opt/src
       - ./../playground/sandbox/target:/opt/target
-#      - type: bind
-#        source: ../playground/sandbox/src
-#        target: /opt/src
-#      - type: bind
-#        source: ../playground/sandbox/target
-#        target: /opt/target
