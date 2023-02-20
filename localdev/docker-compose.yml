@@ -1,0 +1,17 @@
+version: "3.7"
+
+
+services:
+  copier:
+    build: ../docker #TODO remove this since it is path specific, use :dev image, once i know how
+    environment:
+      FOLDER_PAIRS: "some_sda_folder:all_sda;some_other_sda_folder:all_sda;nested/first:first;nested/second:second"
+      SOURCE_ROOT: "/opt/src/"
+      TARGET_ROOT: "/opt/target/"
+    volumes:
+      - type: bind
+        source: ../playground/sandbox/src
+        target: /opt/src
+      - type: bind
+        source: ../playground/sandbox/target
+        target: /opt/target
