@@ -1,5 +1,11 @@
 #!/bin/bash
 
+scriptFilePath=$SCRIPT_FILE_PATH
+if [ -z "$scriptFilePath" ]; then
+  scriptFilePath="/replacements.sed"
+  #DEFAULT
+fi
+
 inotifywait -mr "$SOURCE_ROOT" -e moved_to,create --format '%w%f' |
   while read -r fullPath; do
     ending="${rest: -1}"
@@ -8,7 +14,7 @@ inotifywait -mr "$SOURCE_ROOT" -e moved_to,create --format '%w%f' |
     fi
 
     originalPath=${fullPath#"$SOURCE_ROOT"}
-    replacedPath=$(echo "$originalPath" | sed -r -f replacements.sed)
+    replacedPath=$(echo "$originalPath" | sed -r -f $scriptFilePath)
     if [[ "$originalPath" != "$replacedPath" ]]; then
       echo "mapped $originalPath to $replacedPath"
 

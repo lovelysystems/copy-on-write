@@ -1,4 +1,4 @@
-s#.*/(.*)\.mp3#music/\1\.mp3#g
+s#.*/(.*)\.(mp3)#music/\1\.\2#g
 s#^my_dir/#other_dir/#g
 s#^no_slash_mapping#some_dir#g
 s#^spacey dir/#not_so_spacey/#g
