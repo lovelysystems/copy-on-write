@@ -1,5 +1,4 @@
 #!/bin/bash
-#TODO if source env ends with /, and other input formating expectations
 
 IFS=';' read -r -a pairs <<< "$FOLDER_PAIRS"
 function getTargetFolder {
@@ -18,7 +17,7 @@ function matchesPairing {
   inputFilePath=$1
   sourceFolder=$2
 
-  if [[ $inputFilePath =~ .?$sourceFolder.? ]] #TODO verify that regex in source works
+  if [[ $inputFilePath = *$sourceFolder* ]]
   then
     return 0
   fi
@@ -26,11 +25,10 @@ function matchesPairing {
 }
 
 function getTargetSubFolders {
-  directoryOfFile=$1
-  fileName=$2
-  matchedSourceFolder=$3
+  fullFileName=$1
+  matchedSourceFolder=$2
 
-  rest=${directoryOfFile#*$matchedSourceFolder}
+  rest=${fullFileName#*$matchedSourceFolder}
   #do not quote $matchedSourceFolder, with quotes the expansion will compare it strictly for equality
   # like this bash-regex can be in the folder pairs
   if [[ ${rest: -1} == "/" ]]
@@ -50,7 +48,7 @@ function getOutputPath {
     if matchesPairing "$inputDir$inputFileName" "$sourceFolder";
     then
       targetFolder=$(getTargetFolder "$p")
-      targetFileFolders=$(getTargetSubFolders "$inputDir" "$inputFileName" "$sourceFolder")
+      targetFileFolders=$(getTargetSubFolders "$inputDir$inputFileName" "$sourceFolder")
       echo "$TARGET_ROOT$targetFolder$targetFileFolders/$inputFileName"
       return 0
     fi
