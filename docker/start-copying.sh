@@ -24,7 +24,7 @@ function matchesPairing {
   return 1
 }
 
-function getTargetSubFolders {
+function getTargetPath {
   fullFileName=$1
   matchedSourceFolder=$2
 
@@ -48,8 +48,8 @@ function getOutputPath {
     if matchesPairing "$inputDir$inputFileName" "$sourceFolder";
     then
       targetFolder=$(getTargetFolder "$p")
-      targetFileFolders=$(getTargetSubFolders "$inputDir$inputFileName" "$sourceFolder")
-      echo "$TARGET_ROOT$targetFolder$targetFileFolders/$inputFileName"
+      targetPath=$(getTargetPath "$inputDir$inputFileName" "$sourceFolder")
+      echo "$TARGET_ROOT$targetFolder$targetPath"
       return 0
     fi
   done
