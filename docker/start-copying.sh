@@ -1,5 +1,5 @@
 #!/bin/bash
-#TODO if source env ends with /
+#TODO if source env ends with /, and other input formating expectations
 
 IFS=';' read -r -a pairs <<< "$FOLDER_PAIRS"
 function getTargetFolder {
@@ -25,12 +25,14 @@ function matchesPairing {
   return 1
 }
 
-function getTargetFileFolders {
+function getTargetSubFolders {
   directoryOfFile=$1
   fileName=$2
   matchedSourceFolder=$3
 
-  rest=${directoryOfFile#*"$matchedSourceFolder"}
+  rest=${directoryOfFile#*$matchedSourceFolder}
+  #do not quote $matchedSourceFolder, with quotes the expansion will compare it strictly for equality
+  # like this bash-regex can be in the folder pairs
   if [[ ${rest: -1} == "/" ]]
   then
       rest=${rest:0:-1}
@@ -45,11 +47,10 @@ function getOutputPath {
   for p in "${pairs[@]}";
   do
     sourceFolder=$(getSourceFolder "$p")
-    #echo "checking $inputDir $TARGET_ROOT$sourceFolder"
     if matchesPairing "$inputDir$inputFileName" "$sourceFolder";
     then
       targetFolder=$(getTargetFolder "$p")
-      targetFileFolders=$(getTargetFileFolders "$inputDir" "$inputFileName" "$sourceFolder")
+      targetFileFolders=$(getTargetSubFolders "$inputDir" "$inputFileName" "$sourceFolder")
       echo "$TARGET_ROOT$targetFolder$targetFileFolders/$inputFileName"
       return 0
     fi
@@ -79,8 +80,6 @@ inotifywait -mr "$SOURCE_ROOT" -e moved_to,create |
           mkdir -p "$(dirname "$targetPath")"
           echo "copying to $targetPath"
           cp -p "$fullSourcePath" "$targetPath"
-        elif [[ -d $fullSourcePath ]]; then
-            :
         fi
       fi
   done

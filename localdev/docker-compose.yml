@@ -4,7 +4,7 @@ services:
   copier:
     build: ../docker #TODO remove this since it is path specific, use :dev image, once i know how
     environment:
-      FOLDER_PAIRS: "some_sda_folder:all_sda;some_other_sda_folder:all_sda;nested/first:first;nested/second:second"
+      FOLDER_PAIRS: "some_sda_folder:all_sda;some_other_sda_folder:all_sda;nested/first:first;nested/second:second;*anyDepth*:depthedFolder;some:some/other"
       SOURCE_ROOT: "/opt/src/"
       TARGET_ROOT: "/opt/target/"
     volumes:
