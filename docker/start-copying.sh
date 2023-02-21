@@ -1,83 +1,39 @@
 #!/bin/bash
 
-IFS=';' read -r -a pairs <<< "$FOLDER_PAIRS"
-function getTargetFolder {
-  pair=$1
-  IFS=":" read -r -a pairing <<< "$pair"
-  echo "${pairing[1]}"
-}
-
-function getSourceFolder {
-  pair=$1
-  IFS=":" read -r -a pairing <<< "$pair"
-  echo "${pairing[0]}"
-}
-
-function matchesPairing {
-  inputFilePath=$1
-  sourceFolder=$2
-
-  if [[ $inputFilePath = *$sourceFolder* ]]
-  then
-    return 0
-  fi
-  return 1
-}
-
-function getTargetPath {
-  fullFileName=$1
-  matchedSourceFolder=$2
-
-  rest=${fullFileName#*$matchedSourceFolder}
-  #do not quote $matchedSourceFolder, with quotes the expansion will compare it strictly for equality
-  # like this bash-regex can be in the folder pairs
-  if [[ ${rest: -1} == "/" ]]
-  then
-      rest=${rest:0:-1}
-  fi
-  echo "$rest"
-}
-
-function getOutputPath {
-  inputDir=$1
-  inputFileName=$2
-
-  for p in "${pairs[@]}";
-  do
-    sourceFolder=$(getSourceFolder "$p")
-    if matchesPairing "$inputDir$inputFileName" "$sourceFolder";
-    then
-      targetFolder=$(getTargetFolder "$p")
-      targetPath=$(getTargetPath "$inputDir$inputFileName" "$sourceFolder")
-      echo "$TARGET_ROOT$targetFolder$targetPath"
-      return 0
+IFS=$'\n' read -d '' -r -a pairs <<<"$FOLDER_PAIRS"
+inotifywait -mr "$SOURCE_ROOT" -e moved_to,create --format '%w|%f' | # using the pipe as our seperator
+  while IFS='|' read -r dir file; do
+    fullPath="$dir$file"
+    if [[ -d $fullPath ]]; then #TODO and doesnt end with slash
+      fullPath="$fullPath/"
     fi
-  done
-}
 
-#create target folders
-for p in "${pairs[@]}";
-do
-  targetFolder=$(getTargetFolder $p)
-  targetPath="$TARGET_ROOT$targetFolder"
-  echo "Ensuring directory $targetPath exists"
-  mkdir -p "$targetPath"
-done
+    # TODO test if target of pairs can have slash or not?
 
-inotifywait -mr "$SOURCE_ROOT" -e moved_to,create |
-  while read -r dir action file; do
-    fullSourcePath="$dir$file"
-      echo "getting output for $dir$file"
-      targetPath=$(getOutputPath "$dir" "$file")
+    #ugly but works
+    foundMatch=1
 
-      if [[ -z "$targetPath" ]];
-      then
-        echo "No matching pair found. Ignoring"
-      else
-        if [[ -f $fullSourcePath ]]; then
-          mkdir -p "$(dirname "$targetPath")"
-          echo "copying to $targetPath"
-          cp -p "$fullSourcePath" "$targetPath"
-        fi
+    originalPath=${fullPath#"$SOURCE_ROOT"}
+
+    echo "$fullPath $originalPath"
+    for regex in "${pairs[@]}";
+    do
+      replacedPath=$(echo "$originalPath" | sed "s#$regex#g")
+      if [[ "$originalPath" != "$replacedPath" ]]; then
+        echo "mapped $originalPath to $replacedPath"
+        foundMatch=0
+        break
+        # this has the behaviour that the first match is the "winning" match
       fi
+    done
+
+    if [[ $foundMatch == 0 ]]; then
+      if [[ -d $fullPath ]]; then
+        echo "making dir $TARGET_ROOT$replacedPath"
+        mkdir "$TARGET_ROOT$replacedPath"
+      else
+        echo "copying file $TARGET_ROOT$replacedPath"
+        cp -p "$fullPath" "$TARGET_ROOT$replacedPath"
+      fi
+    fi
   done
