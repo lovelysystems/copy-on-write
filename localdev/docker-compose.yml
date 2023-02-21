@@ -1,17 +1,25 @@
-version: "3.7"
+version: "3.9"
 
 services:
   copier:
     build: ../docker
     environment:
       FOLDER_PAIRS: |
-        ^my_dir/#other_dir/
+        ^my_dir/(.+)\.(mp3|tiff)\.mp3#other_dir/\1\.\2
+        ^no_slash_mapping#some_dir
         ^spacey dir/#not_so_spacey/
         ^not_so_spacey/#spacey target/
         ^my_other_dir/#other_dir/
+        ^stran"F%lder/#normalFolder/
+        ^someNormalFolder/#st"F%lder/
         nested/first/#first/
         nested/second/#second/
-      # mappings cant have line ending marker
+        ^strange$Folder/#notSoStrangeFolder/
+        ^notStrangeFolder/#stranger$Folder/
+      # mapping cant contain '$'
+      # Folder pairs are separated by '#'
+      # folder pairs dont need to end with a '/', but if the source ends with '/' then also the target needs to end with '/' and vice versa
+      # mappings cant have line ending marker (files in folders will not be picked up), input beginning markers '^' are beginning from SOURCE_ROOT
       # The "root" environment variables should end with a '/'
       SOURCE_ROOT: "/opt/src/"
       TARGET_ROOT: "/opt/target/"

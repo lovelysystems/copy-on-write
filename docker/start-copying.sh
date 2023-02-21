@@ -4,7 +4,8 @@ IFS=$'\n' read -d '' -r -a pairs <<<"$FOLDER_PAIRS"
 inotifywait -mr "$SOURCE_ROOT" -e moved_to,create --format '%w|%f' | # using the pipe as our seperator
   while IFS='|' read -r dir file; do
     fullPath="$dir$file"
-    if [[ -d $fullPath ]]; then #TODO and doesnt end with slash
+    ending="${rest: -1}"
+    if [ -d "$fullPath" ] && [ "$ending" != "/" ]; then #TODO and doesnt end with slash
       fullPath="$fullPath/"
     fi
 
