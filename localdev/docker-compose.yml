@@ -7,7 +7,8 @@ services:
       # the folder pairs support glob pattern matching for the source folders
       # if multiple pairings match any new file creation the first one in the list is chosen
       FOLDER_PAIRS: "*\\.mp3:mp3_files;some_sda_folder:all_sda;some_other_sda_folder:all_sda;nested/first:first;nested/second:second;*anyDepth*:depthedFolder;some:some/other"
-      SOURCE_ROOT: "/opt/src/" # The "root" environment variables should end with a '/'
+      # The "root" environment variables should end with a '/'
+      SOURCE_ROOT: "/opt/src/"
       TARGET_ROOT: "/opt/target/"
     volumes:
       - ./../playground/sandbox/src:/opt/src
