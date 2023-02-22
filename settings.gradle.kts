@@ -1,3 +1,3 @@
 
-rootProject.name = "copyonwrite"
+rootProject.name = "copy-on-write"
 

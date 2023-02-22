@@ -1,2 +1,2 @@
-# Changes for copyonwrite
+# Changes for copy-on-write
 
