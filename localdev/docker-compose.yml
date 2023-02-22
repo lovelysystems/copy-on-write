@@ -4,7 +4,7 @@ services:
   copier:
     build: ../docker
     environment:
-      SCRIPT_FILE_PATH: "/replacements.sed" # this is also the default value
+      SCRIPT_FILE_PATH: "/replacements.sed" # this is also the default value, to use a custom script mount it as volume and change this path
       SOURCE_ROOT: "/opt/src/"
       TARGET_ROOT: "/opt/target/"
       # The "root" environment variables should end with a '/'

@@ -6,7 +6,7 @@ if [ -z "$scriptFilePath" ]; then
   #DEFAULT
 fi
 
-inotifywait -mr "$SOURCE_ROOT" -e moved_to,create --format '%w%f' |
+inotifywait -mr "$SOURCE_ROOT" -e moved_to -e create --format '%w%f' |
   while read -r fullPath; do
     ending="${rest: -1}"
     if [ -d "$fullPath" ] && [ "$ending" != "/" ]; then
