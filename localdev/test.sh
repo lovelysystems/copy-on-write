@@ -31,6 +31,7 @@ mkdir nested/second
 mkdir notStrangeFolder
 
 mkdir unmappedMusicFolder
+sleep 1
 
 cd my_dir
 touch "contentA.txt"

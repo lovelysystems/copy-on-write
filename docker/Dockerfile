@@ -4,9 +4,9 @@ FROM alpine:3.16.4
 RUN apk add --no-cache bash
 RUN apk add --no-cache inotify-tools
 
-COPY ./start-copying.sh /
+COPY docker-entrypoint.sh /
 COPY ./replacements.sed /
 
-RUN chmod 750 /start-copying.sh
+RUN chmod 750 /docker-entrypoint.sh
 
-ENTRYPOINT ["/start-copying.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
