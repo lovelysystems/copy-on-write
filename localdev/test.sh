@@ -109,6 +109,9 @@ fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
 
 cd ../../localdev
 
+rm -rf ../sandbox/src/*
+rm -rf ../sandbox/target/*
+
 docker compose down
 
 if [ $success = "false" ]; then

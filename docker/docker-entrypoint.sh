@@ -28,8 +28,7 @@ entries=( "${files[@]#./}")
 function copyIfMapped {
   fullPath=$1
 
-  ending="${rest: -1}"
-  if [ -d "$fullPath" ] && [ "$ending" != "/" ]; then
+  if [ -d "$fullPath" ]; then
     fullPath="$fullPath/"
   fi
   originalPath=${fullPath#"$SOURCE_ROOT"}
