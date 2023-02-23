@@ -9,6 +9,8 @@ docker compose down #incase
 
 mkdir -p ../volumes/src/existBeforeStart
 echo "some content" > ../volumes/src/existBeforeStart/some.txt
+echo "some other content" > "../volumes/src/existBeforeStart/some spacey starter.txt"
+echo "a" > "../volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
 sleep 1
 docker compose up --build -d --wait
@@ -106,7 +108,8 @@ fileShouldExist "not_so_spacey_target/space content.txt"
 fileShouldExist "music/spacey test.mp3"
 
 fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
-
+fileShouldExistWithContent "mappedDuringStart/some spacey starter.txt" "some other content"
+fileShouldExistWithContent "mappedDuringStart/some strange %'12&( starter.txt" "a"
 
 cd ../../localdev
 

@@ -34,7 +34,7 @@ function copyIfMapped {
 
 export -f copyIfMapped
 
-find "$SOURCE_ROOT" -exec bash -c "copyIfMapped \"{}\"" \;
+find "$SOURCE_ROOT" -exec bash -c 'copyIfMapped "$1"' bash {} \;
 
 #do NOT include the "open" event, copy command will trigger a open event -> resulting in an endless loop
 inotifywait -mr "$SOURCE_ROOT" -e moved_to -e create -e modify --format '%w%f' |
