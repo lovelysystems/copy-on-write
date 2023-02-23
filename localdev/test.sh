@@ -1,20 +1,18 @@
 #!/bin/sh
 
-rm -rf ../sandbox/src/*
-rm -rf ../sandbox/target/*
-
 docker compose down #incase
 
-mkdir ../sandbox/src/existBeforeStart
-echo "some content" > ../sandbox/src/existBeforeStart/some.txt
+mkdir -p ../volumes/src/existBeforeStart
+echo "some content" > ../volumes/src/existBeforeStart/some.txt
 
+sleep 1
 docker compose up --build -d --wait
 sleep 2 # so the container has time do initial copying and initialize the watches
 
-mkdir ../sandbox/target/music
+mkdir ../volumes/target/music
 
 success="true"
-cd ../sandbox/src
+cd ../volumes/src
 
 #create files in src
 mkdir my_dir
@@ -56,8 +54,6 @@ sleep 1
 
 # check they exist in target
 
-success=1
-
 dirShouldExist() {
   path=$1
   if [ ! -d "$path" ]; then
@@ -89,9 +85,9 @@ fileShouldExist() {
 
 fileShouldExistWithContent() {
   fileShouldExist "$1"
-  content=$(cat "$1")
-  if [ "$content" != "$2" ]; then
-    echo "File $1 should have content $2, but had $content"
+  contentAct=$(cat "$1")
+  if [ "$contentAct" != "$2" ]; then
+    echo "File $1 should have content $2 but had $contentAct"
     success="false"
   fi
 }
@@ -109,8 +105,8 @@ fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
 
 cd ../../localdev
 
-rm -rf ../sandbox/src/*
-rm -rf ../sandbox/target/*
+rm -rf ../volumes/src/*
+rm -rf ../volumes/target/*
 
 docker compose down
 

@@ -17,14 +17,6 @@ if [[ ! -d "$TARGET_ROOT" ]]; then
   exit 1
 fi
 
-oldWd=$(pwd)
-cd $SOURCE_ROOT
-filesList=$(find .)
-readarray -t files <<< "$filesList"
-cd $oldWd
-files=("${files[@]:1}") # remove first element in find results (the directory self reference to source root)
-entries=( "${files[@]#./}")
-
 function copyIfMapped {
   fullPath=$1
 
@@ -33,17 +25,16 @@ function copyIfMapped {
   fi
   originalPath=${fullPath#"$SOURCE_ROOT"}
 
-  replacedPath=$(echo "$originalPath" | sed -r -f "$scriptFilePath")
+  replacedPath=$(echo "$originalPath" | sed -r -f "${SCRIPT_FILE_PATH:-"replacements.sed"}")
   if [[ "$originalPath" != "$replacedPath" ]]; then
     >&2 echo "copying to $TARGET_ROOT$replacedPath"
     cp -pR "$fullPath" "$TARGET_ROOT$replacedPath"
   fi
 }
 
-for e in "${entries[@]}"
-do
-  copyIfMapped "$SOURCE_ROOT$e"
-done
+export -f copyIfMapped
+
+find "$SOURCE_ROOT" -exec bash -c "copyIfMapped \"{}\"" \;
 
 #do NOT include the "open" event, copy command will trigger a open event -> resulting in an endless loop
 inotifywait -mr "$SOURCE_ROOT" -e moved_to -e create -e modify --format '%w%f' |

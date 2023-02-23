@@ -5,8 +5,11 @@ Works based on regex substitution. See [replacements](localdev/replacements.sed)
 
 On startup existing files/directories in SOURCE_ROOT are mapped and copied to target if mapped.
 
+See [localdev/docker-compose.yml](localdev/docker-compose.yml) for usage
 
-See `localdev` for usage
+## Tests
+Tests can be run by executing [test.sh](localdev/test.sh). This requires docker engine to be running locally and docker compose v2.
+The test script must be started from the [localdev](localdev) directory.
 
 ## Limitations
 - when a folder in the source directories is renamed a folder with the corresponding name will be created in target. However, the old folder in target will still exist. 
