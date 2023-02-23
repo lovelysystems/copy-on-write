@@ -1,5 +1,10 @@
 #!/bin/sh
 
+#so that the script can be called from any directory
+originalWd=$(pwd)
+cd "$(dirname $0)"
+trap 'cd $originalWd' EXIT
+
 docker compose down #incase
 
 mkdir -p ../volumes/src/existBeforeStart
