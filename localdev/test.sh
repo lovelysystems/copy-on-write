@@ -109,7 +109,7 @@ fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
 
 cd ../../localdev
 
-#docker compose down
+docker compose down
 
 if [ $success = "false" ]; then
   echo "Tests Failed"
