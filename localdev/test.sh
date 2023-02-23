@@ -25,17 +25,23 @@ mkdir 'stran"F%lder'
 mkdir someNormalFolder
 
 mkdir nested
+mkdir my_dir/subFolder
+mkdir my_dir/floder
 sleep 1
 mkdir nested/first
 mkdir nested/second
 mkdir notStrangeFolder
 
 mkdir unmappedMusicFolder
+echo "content in folder with typo" > my_dir/floder/stuff.txt
 sleep 1
 
 cd my_dir
-touch "contentA.txt"
-touch "spacey contentWith $%strange.txt"
+mv floder folder
+echo "content in sub folder" > subFolder/file.txt
+echo "Hello ContentA" > contentA.txt
+echo "Some unimportant Content. " > "spacey contentWith $%strange.txt"
+echo "Some unimportant Content. more unimportant content" > "spacey contentWith $%strange.txt"
 cd ../"spacey dir"
 touch "content.txt"
 touch "space content.txt"
@@ -80,8 +86,19 @@ fileShouldExist() {
   fi
 }
 
-fileShouldExist "other_dir/contentA.txt"
-fileShouldExist "other_dir/spacey contentWith $%strange.txt"
+fileShouldExistWithContent() {
+  fileShouldExist "$1"
+  content=$(cat "$1")
+  if [ "$content" != "$2" ]; then
+    echo "File $1 should have content $2, but had $content"
+    success="false"
+  fi
+}
+
+fileShouldExistWithContent "other_dir/contentA.txt" "Hello ContentA"
+fileShouldExistWithContent "other_dir/folder/stuff.txt" "content in folder with typo"
+fileShouldExistWithContent "other_dir/spacey contentWith $%strange.txt" "Some unimportant Content. more unimportant content"
+fileShouldExistWithContent "other_dir/subFolder/file.txt" "content in sub folder"
 fileShouldExist "not_so_spacey_target/content.txt"
 fileShouldExist "not_so_spacey_target/space content.txt"
 fileShouldExist "music/spacey test.mp3"
