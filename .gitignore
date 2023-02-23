@@ -1,8 +1,5 @@
-sandbox/
-.idea/
+/.idea/
+/build/
 .gradle
-
-gradle-app.setting
-!gradle-wrapper.jar
-!gradle-wrapper.properties
-.gradletasknamecache
+*.iml
+/sandbox/

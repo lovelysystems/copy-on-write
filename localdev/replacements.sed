@@ -9,3 +9,4 @@ s#^someNormalFolder/#st"F%lder/#g
 s#nested/first/#first/#g
 s#nested/second/#second/#g
 s#^notStrangeFolder/#stranger$Folder/#g
+s#^existBeforeStart/#mappedDuringStart/#g

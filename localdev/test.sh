@@ -1,14 +1,15 @@
 #!/bin/sh
 
-
-docker compose down #incase
-docker compose up --build -d --wait
-
-sleep 2 # so the container has time to initialize the watches
-
-#setup folders on host
 rm -rf ../sandbox/src/*
 rm -rf ../sandbox/target/*
+
+docker compose down #incase
+
+mkdir ../sandbox/src/existBeforeStart
+echo "some content" > ../sandbox/src/existBeforeStart/some.txt
+
+docker compose up --build -d --wait
+sleep 2 # so the container has time do initial copying and initialize the watches
 
 mkdir ../sandbox/target/music
 
@@ -103,9 +104,12 @@ fileShouldExist "not_so_spacey_target/content.txt"
 fileShouldExist "not_so_spacey_target/space content.txt"
 fileShouldExist "music/spacey test.mp3"
 
+fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
+
+
 cd ../../localdev
 
-docker compose down
+#docker compose down
 
 if [ $success = "false" ]; then
   echo "Tests Failed"
