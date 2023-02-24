@@ -10,5 +10,5 @@ services:
       # The "root" environment variables should end with a '/'
     volumes:
       - ./replacements.sed:/replacements.sed
-      - ./../volumes/src:/mnt/src
-      - ./../volumes/target:/mnt/target
+      - ./volumes/src:/mnt/src
+      - ./volumes/target:/mnt/target

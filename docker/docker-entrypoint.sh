@@ -1,6 +1,6 @@
 #!/bin/bash
 
-scriptFilePath=${SCRIPT_FILE_PATH:-"replacements.sed"}
+scriptFilePath=${SCRIPT_FILE_PATH:-"/replacements.sed"}
 
 if [[ ! -f "$scriptFilePath" ]]; then
   echo "Script file not found at $scriptFilePath. Exiting"

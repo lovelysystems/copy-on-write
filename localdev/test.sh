@@ -7,19 +7,19 @@ trap 'cd $originalWd' EXIT
 
 docker compose down #incase
 
-mkdir -p ../volumes/src/existBeforeStart
-echo "some content" > ../volumes/src/existBeforeStart/some.txt
-echo "some other content" > "../volumes/src/existBeforeStart/some spacey starter.txt"
-echo "a" > "../volumes/src/existBeforeStart/some strange %'12&( starter.txt"
+mkdir -p volumes/src/existBeforeStart
+echo "some content" > volumes/src/existBeforeStart/some.txt
+echo "some other content" > "volumes/src/existBeforeStart/some spacey starter.txt"
+echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
 sleep 1
 docker compose up --build -d --wait
 sleep 2 # so the container has time do initial copying and initialize the watches
 
-mkdir ../volumes/target/music
+mkdir volumes/target/music
 
 success="true"
-cd ../volumes/src
+cd volumes/src
 
 #create files in src
 mkdir my_dir
@@ -111,10 +111,10 @@ fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
 fileShouldExistWithContent "mappedDuringStart/some spacey starter.txt" "some other content"
 fileShouldExistWithContent "mappedDuringStart/some strange %'12&( starter.txt" "a"
 
-cd ../../localdev
+cd ../..
 
-rm -rf ../volumes/src/*
-rm -rf ../volumes/target/*
+rm -rf volumes/src/*
+rm -rf volumes/target/*
 
 docker compose down
 
