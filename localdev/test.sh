@@ -46,6 +46,8 @@ cd my_dir
 mv floder folder
 echo "content in sub folder" > subFolder/file.txt
 echo "Hello ContentA" > contentA.txt
+
+contentAMTime=$(stat -f '%m' contentA.txt)
 echo "Some unimportant Content. " > "spacey contentWith $%strange.txt"
 echo "Some unimportant Content. more unimportant content" > "spacey contentWith $%strange.txt"
 cd ../"spacey dir"
@@ -100,6 +102,14 @@ fileShouldExistWithContent() {
 }
 
 fileShouldExistWithContent "other_dir/contentA.txt" "Hello ContentA"
+
+actMTime=$(stat -f '%m' other_dir/contentA.txt)
+
+if [ "$contentAMTime" != "$actMTime" ]; then
+  echo "ContentA should have mTime $contentAMTime but had $actMTime"
+  success="false"
+fi
+
 fileShouldExistWithContent "other_dir/folder/stuff.txt" "content in folder with typo"
 fileShouldExistWithContent "other_dir/spacey contentWith $%strange.txt" "Some unimportant Content. more unimportant content"
 fileShouldExistWithContent "other_dir/subFolder/file.txt" "content in sub folder"
