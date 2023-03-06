@@ -31,7 +31,7 @@ function copyIfMapped {
     # cp will create all new timestamps for the new file
     cp -R "$fullPath" "$TARGET_ROOT$replacedPath"
     # we want to preserve the mtime from the old file, copy the timestamp from the oldfile
-    touch -r "$fullPath" "$TARGET_ROOT$replacedPath" # copies the access & modify time from the oldfile, sets the changetime to now
+    touch -m -r "$fullPath" "$TARGET_ROOT$replacedPath" # take the modify time from the oldfile
   fi
 }
 

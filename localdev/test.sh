@@ -1,5 +1,7 @@
 #!/bin/sh
 
+
+
 #so that the script can be called from any directory
 originalWd=$(pwd)
 cd "$(dirname $0)"
@@ -9,6 +11,9 @@ docker compose down #incase
 
 mkdir -p volumes/src/existBeforeStart
 echo "some content" > volumes/src/existBeforeStart/some.txt
+
+fileCTime=$(stat -f '%c' volumes/src/existBeforeStart/some.txt)
+
 echo "some other content" > "volumes/src/existBeforeStart/some spacey starter.txt"
 echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
@@ -118,6 +123,24 @@ fileShouldExist "not_so_spacey_target/space content.txt"
 fileShouldExist "music/spacey test.mp3"
 
 fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
+
+actCTime=$(stat -f '%c' mappedDuringStart/some.txt)
+now=$(date +%s)
+earliestAllowedCTime=$((now - 10)) # give 10 seconds, to allow between the copying and when this is evaluated
+
+
+# checking for a range and that it is not equal to the ctime before the container was started. Because this is tested on
+# the first file that is created during the test as opposed to taking a file that needs to be present before the test is started
+if [ "$actCTime" -lt "$earliestAllowedCTime" ]; then
+  echo "CTime of mappedDuringStart/some.txt was earlier than allowed. CTime should be updated to the current time during copy"
+  success="false"
+fi
+if [ "$actCTime" = "$fileCTime" ]; then
+  echo "CTime of mappedDuringStart/some.txt should have been updated during copy, but was the same as on source file"
+  success="false"
+fi
+
+
 fileShouldExistWithContent "mappedDuringStart/some spacey starter.txt" "some other content"
 fileShouldExistWithContent "mappedDuringStart/some strange %'12&( starter.txt" "a"
 
