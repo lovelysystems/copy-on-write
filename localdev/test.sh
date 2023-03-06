@@ -19,6 +19,8 @@ echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
 sleep 1
 docker compose up --build -d --wait
+containerStartedTS=$(date +%s)
+
 sleep 2 # so the container has time do initial copying and initialize the watches
 
 mkdir volumes/target/music
@@ -125,16 +127,14 @@ fileShouldExist "music/spacey test.mp3"
 fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
 
 actCTime=$(stat -f '%c' mappedDuringStart/some.txt)
-now=$(date +%s)
-earliestAllowedCTime=$((now - 10)) # give 10 seconds, to allow between the copying and when this is evaluated
+earliestAllowedCTime=$((containerStartedTS))
 
-
-# checking for a range and that it is not equal to the ctime before the container was started. Because this is tested on
-# the first file that is created during the test as opposed to taking a file that needs to be present before the test is started
+# the ctime of the copied file should be updated to now during the copy. That will happen after container has started
 if [ "$actCTime" -lt "$earliestAllowedCTime" ]; then
-  echo "CTime of mappedDuringStart/some.txt was earlier than allowed. CTime should be updated to the current time during copy"
+  echo "CTime of mappedDuringStart/some.txt was earlier than allowed. CTime should be updated to the current time during copy. Which needs to be after the container has started"
   success="false"
 fi
+# ctime should have changed during copy
 if [ "$actCTime" = "$fileCTime" ]; then
   echo "CTime of mappedDuringStart/some.txt should have been updated during copy, but was the same as on source file"
   success="false"
