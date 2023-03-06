@@ -2,4 +2,4 @@
 
 ## 2023-03-06
 
-Update timestamps when copying
+Set created/modified timestamp to now on copy
