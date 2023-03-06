@@ -28,7 +28,7 @@ function copyIfMapped {
   replacedPath=$(echo "$originalPath" | sed -r -f "${SCRIPT_FILE_PATH:-"replacements.sed"}")
   if [[ "$originalPath" != "$replacedPath" ]]; then
     >&2 echo "copying to $TARGET_ROOT$replacedPath"
-    cp -pR "$fullPath" "$TARGET_ROOT$replacedPath"
+    cp -R "$fullPath" "$TARGET_ROOT$replacedPath"
   fi
 }
 
