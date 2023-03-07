@@ -1,5 +1,7 @@
 #!/bin/sh
 
+
+
 #so that the script can be called from any directory
 originalWd=$(pwd)
 cd "$(dirname $0)"
@@ -9,11 +11,16 @@ docker compose down #incase
 
 mkdir -p volumes/src/existBeforeStart
 echo "some content" > volumes/src/existBeforeStart/some.txt
+
+fileCTime=$(stat -f '%c' volumes/src/existBeforeStart/some.txt)
+
 echo "some other content" > "volumes/src/existBeforeStart/some spacey starter.txt"
 echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
 sleep 1
 docker compose up --build -d --wait
+containerStartedTS=$(date +%s)
+
 sleep 2 # so the container has time do initial copying and initialize the watches
 
 mkdir volumes/target/music
@@ -46,6 +53,8 @@ cd my_dir
 mv floder folder
 echo "content in sub folder" > subFolder/file.txt
 echo "Hello ContentA" > contentA.txt
+
+contentAMTime=$(stat -f '%m' contentA.txt)
 echo "Some unimportant Content. " > "spacey contentWith $%strange.txt"
 echo "Some unimportant Content. more unimportant content" > "spacey contentWith $%strange.txt"
 cd ../"spacey dir"
@@ -100,6 +109,14 @@ fileShouldExistWithContent() {
 }
 
 fileShouldExistWithContent "other_dir/contentA.txt" "Hello ContentA"
+
+actMTime=$(stat -f '%m' other_dir/contentA.txt)
+
+if [ "$contentAMTime" != "$actMTime" ]; then
+  echo "ContentA should have mTime $contentAMTime but had $actMTime"
+  success="false"
+fi
+
 fileShouldExistWithContent "other_dir/folder/stuff.txt" "content in folder with typo"
 fileShouldExistWithContent "other_dir/spacey contentWith $%strange.txt" "Some unimportant Content. more unimportant content"
 fileShouldExistWithContent "other_dir/subFolder/file.txt" "content in sub folder"
@@ -108,6 +125,22 @@ fileShouldExist "not_so_spacey_target/space content.txt"
 fileShouldExist "music/spacey test.mp3"
 
 fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
+
+actCTime=$(stat -f '%c' mappedDuringStart/some.txt)
+earliestAllowedCTime=$((containerStartedTS))
+
+# the ctime of the copied file should be updated to now during the copy. That will happen after container has started
+if [ "$actCTime" -lt "$earliestAllowedCTime" ]; then
+  echo "CTime of mappedDuringStart/some.txt was earlier than allowed. CTime should be updated to the current time during copy. Which needs to be after the container has started"
+  success="false"
+fi
+# ctime should have changed during copy
+if [ "$actCTime" = "$fileCTime" ]; then
+  echo "CTime of mappedDuringStart/some.txt should have been updated during copy, but was the same as on source file"
+  success="false"
+fi
+
+
 fileShouldExistWithContent "mappedDuringStart/some spacey starter.txt" "some other content"
 fileShouldExistWithContent "mappedDuringStart/some strange %'12&( starter.txt" "a"
 

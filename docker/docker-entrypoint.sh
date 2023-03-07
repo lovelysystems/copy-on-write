@@ -28,7 +28,10 @@ function copyIfMapped {
   replacedPath=$(echo "$originalPath" | sed -r -f "${SCRIPT_FILE_PATH:-"replacements.sed"}")
   if [[ "$originalPath" != "$replacedPath" ]]; then
     >&2 echo "copying to $TARGET_ROOT$replacedPath"
+    # cp will create all new timestamps for the new file
     cp -R "$fullPath" "$TARGET_ROOT$replacedPath"
+    # we want to preserve the mtime from the old file, copy the timestamp from the oldfile
+    touch -m -r "$fullPath" "$TARGET_ROOT$replacedPath" # take the modify time from the oldfile
   fi
 }
 
