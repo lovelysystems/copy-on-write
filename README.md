@@ -12,7 +12,7 @@ Tests can be run by executing [test.sh](localdev/test.sh). This requires docker 
 
 ## Development
 
-To test changes, tell compose to rebuild the image before startup: `docker compose up --build`
+To test changes, tell compose to rebuild the image before startup: `docker compose up --build --force-recreate`
 
 ## Limitations
 
