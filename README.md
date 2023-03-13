@@ -4,10 +4,20 @@ Docker image to maintain a duplicated directory structure. Works based on filesy
 
 On startup existing files/directories in SOURCE_ROOT are mapped and copied to target if mapped.
 
-See [localdev/docker-compose.yml](localdev/docker-compose.yml) for usage
+See [localdev/docker-compose.yml](localdev/docker-compose.yml) for an example configuration.
 
 ## Tests
+
 Tests can be run by executing [test.sh](localdev/test.sh). This requires docker engine to be running locally and docker compose v2.
 
+## Development
+
+To test changes, tell compose to rebuild the image before startup: `docker compose up --build`
+
 ## Limitations
-- when a folder in the source directories is renamed a folder with the corresponding name will be created in target. However, the old folder in target will still exist. 
+
+- when a folder in the source directories is renamed a folder with the corresponding name will be created in target. However, the old folder in target will still exist.
+
+- test.sh depend on output of `stat` command which is filesystem specific (tested on macos with `apfs`)
+
+- on linux test.sh needs to be run as root user (or docker/docker-compose configured to run with the current user)
