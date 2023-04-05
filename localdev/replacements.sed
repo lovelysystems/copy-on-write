@@ -24,6 +24,9 @@ s#nested/second/#second/#g
 # folder that will be present on startup already
 s#^existBeforeStart/#mappedDuringStart/#g
 
+# ignore `.dot` files, map only mp3/json, create subdirectories
+s#^on_demand_(\w+)\/([^\.](.+\.(mp3|json)))#ondemand/\1/\2#g
+
 # ATTENTION, replacements are chained:
 # files put into /one will end up in /three
 s#^one/(.*)#two/\1#g

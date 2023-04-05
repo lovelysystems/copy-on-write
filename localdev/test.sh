@@ -63,6 +63,12 @@ mkdir unmappedMusicFolder
 echo "content in folder with typo" > my_dir/floder/stuff.txt
 sleep 1
 
+mkdir "on_demand_argovia"
+touch "on_demand_argovia/.in.C055AA93-BC24.json"
+touch "on_demand_argovia/C055AA93-BC24.mp3"
+touch "on_demand_argovia/C055AA93-BC24.json"
+touch "on_demand_argovia/C055AA93-BC24.txt"
+
 cd my_dir
 mv floder folder
 echo "content in sub folder" > subFolder/file.txt
@@ -116,6 +122,13 @@ dirShouldExist "music"
 fileShouldExist() {
   if [ ! -f "$1" ]; then
     echo "File $1 should exist but didnt"
+    success="false"
+  fi
+}
+
+fileShouldNotExist() {
+  if [ -f "$1" ]; then
+    echo "File $1 should not exist but did"
     success="false"
   fi
 }
@@ -177,6 +190,14 @@ fi
 
 fileShouldExistWithContent "mappedDuringStart/some spacey starter.txt" "some other content"
 fileShouldExistWithContent "mappedDuringStart/some strange %'12&( starter.txt" "a"
+
+# interim directories have been created
+dirShouldExist "ondemand/argovia"
+fileShouldExist "ondemand/argovia/C055AA93-BC24.mp3"
+fileShouldExist "ondemand/argovia/C055AA93-BC24.json"
+# dot file and txt not mapped
+fileShouldNotExist "ondemand/argovia/.in.C055AA93-BC24.json"
+fileShouldNotExist "ondemand/argovia/C055AA93-BC24.txt"
 
 cd ../..
 
