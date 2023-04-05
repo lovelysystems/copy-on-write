@@ -10,6 +10,7 @@ trap 'cd $originalWd' EXIT
 docker compose down #incase
 
 mkdir -p volumes/src/existBeforeStart
+mkdir -p volumes/src/existBeforeStart/empty
 echo "some content" > volumes/src/existBeforeStart/some.txt
 
 fileCTime=$(stat -f '%c' volumes/src/existBeforeStart/some.txt)
@@ -23,7 +24,6 @@ containerStartedTS=$(date +%s)
 
 sleep 2 # so the container has time do initial copying and initialize the watches
 
-mkdir volumes/target/music
 
 success="true"
 cd volumes/src
@@ -31,19 +31,33 @@ cd volumes/src
 #create files in src
 mkdir my_dir
 mkdir no_slash_mapping
+touch no_slash_mapping/foo.txt
+mkdir empty_dir
+mkdir empty_dir/subfolder  # empty folders are ignored
 mkdir "spacey dir"
 mkdir not_so_spacey
-mkdir my_other_dir
+touch not_so_spacey/foo.txt
 mkdir 'stran"F%lder'
+touch 'stran"F%lder/foo.txt'
 mkdir someNormalFolder
+touch someNormalFolder/foo.txt
 
 mkdir nested
 mkdir my_dir/subFolder
 mkdir my_dir/floder
 sleep 1
 mkdir nested/first
+touch nested/first/foo.txt
 mkdir nested/second
+touch nested/second/foo.txt
 mkdir notStrangeFolder
+touch notStrangeFolder/foo.txt
+
+mkdir one
+touch one/foo.txt
+
+mkdir -p songs/artist_prince
+touch "songs/artist_prince/purple rain.mp3"
 
 mkdir unmappedMusicFolder
 echo "content in folder with typo" > my_dir/floder/stuff.txt
@@ -62,7 +76,7 @@ touch "content.txt"
 touch "space content.txt"
 cd ../unmappedMusicFolder
 
-touch "spacey test.mp3"
+touch "unmapped spacey test.mp3"
 
 cd ../../target
 
@@ -78,12 +92,19 @@ dirShouldExist() {
   fi
 }
 
+dirShouldNotExist() {
+  path=$1
+  if [ -d "$path" ]; then
+    echo "$path should not exist but exsits"
+    success="false"
+  fi
+}
 
 dirShouldExist "other_dir"
 dirShouldExist "some_dir"
-dirShouldExist "not_so_spacey_target"
+# empty directory should not be mapped
+dirShouldNotExist "mapped_dir"
 dirShouldExist "spacey target"
-dirShouldExist "also_another_dir"
 dirShouldExist "normalFolder"
 dirShouldExist 'st"F%lder'
 dirShouldExist "first"
@@ -117,14 +138,27 @@ if [ "$contentAMTime" != "$actMTime" ]; then
   success="false"
 fi
 
-fileShouldExistWithContent "other_dir/folder/stuff.txt" "content in folder with typo"
+# chained sed replacements
+dirShouldExist "three"
+dirShouldNotExist "two"
+dirShouldNotExist "one"
+
+# the folder with type in its name that got renamed, still exists in the target
+fileShouldExistWithContent "other_dir/floder/stuff.txt" "content in folder with typo"
+# LIMITATION: renaming the folder created no new copy of the folder
+# (as inotifywait only received a folder and folders are ignored)
+# the non-empty folder will be recognized on the next startup
+dirShouldNotExist "other_dir/folder"
+#fileShouldExistWithContent "other_dir/folder/stuff.txt" "content in folder with typo"
+
 fileShouldExistWithContent "other_dir/spacey contentWith $%strange.txt" "Some unimportant Content. more unimportant content"
 fileShouldExistWithContent "other_dir/subFolder/file.txt" "content in sub folder"
 fileShouldExist "not_so_spacey_target/content.txt"
 fileShouldExist "not_so_spacey_target/space content.txt"
-fileShouldExist "music/spacey test.mp3"
+fileShouldExist "music/prince/purple rain.mp3"
 
 fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
+dirShouldNotExist "mappedDuringStart/empty"
 
 actCTime=$(stat -f '%c' mappedDuringStart/some.txt)
 earliestAllowedCTime=$((containerStartedTS))

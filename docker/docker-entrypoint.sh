@@ -20,15 +20,24 @@ fi
 function copyIfMapped {
   fullPath=$1
 
+  # do not handle directories at all
   if [ -d "$fullPath" ]; then
-    fullPath="$fullPath/"
+    return
   fi
+
   originalPath=${fullPath#"$SOURCE_ROOT"}
   replacedPath=$(echo "$originalPath" | sed -r -f "${SCRIPT_FILE_PATH:-"replacements.sed"}")
   if [[ "$originalPath" != "$replacedPath" ]]; then
     >&2 echo "copying $fullPath to $TARGET_ROOT$replacedPath"
+
+    directory="$(dirname "$TARGET_ROOT$replacedPath")"
+    if [[ ! -d "$directory" ]]; then
+      >&2 echo "creating intermediate directories for $directory"
+      mkdir -p "$directory"
+    fi
+
     # cp will create all new timestamps for the new file
-    cp -R "$fullPath" "$TARGET_ROOT$replacedPath"
+    cp "$fullPath" "$TARGET_ROOT$replacedPath"
     # we want to preserve the mtime from the old file, copy the timestamp from the oldfile
     touch -m -r "$fullPath" "$TARGET_ROOT$replacedPath" # take the modify time from the oldfile
   fi
@@ -39,7 +48,7 @@ export -f copyIfMapped
 >&2 echo "Searching for mapped files and directories in $SOURCE_ROOT"
 >&2 echo "Checking `find $SOURCE_ROOT | wc -l` items..."
 
-find "$SOURCE_ROOT" -exec bash -c 'copyIfMapped "{}"' \;
+find "$SOURCE_ROOT" -type f -exec bash -c 'copyIfMapped "{}"' \;
 
 >&2 echo "Watching for updates in $SOURCE_ROOT"
 

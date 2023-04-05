@@ -16,7 +16,10 @@ To test changes, tell compose to rebuild the image before startup: `docker compo
 
 ## Limitations
 
-- when a folder in the source directories is renamed a folder with the corresponding name will be created in target. However, the old folder in target will still exist.
+- when a folder in the source directories is renamed a folder with the mapped name will not be created in target immediately.
+
+  * On restart, the new folder and existing files will be copied.
+  * Howevers, the old folder in target will still exist (not get removed/renamed)
 
 - test.sh depend on output of `stat` command which is filesystem specific (tested on macos with `apfs`)
 
