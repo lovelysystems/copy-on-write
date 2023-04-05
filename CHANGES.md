@@ -1,9 +1,14 @@
 # Changes for copy-on-write
 
+## 2023-04-05 / 1.1.0
+
+### Breaking
+
+* Only treat files, create intermediate folders if necessary
+
 ## 2023-03-13 / 1.0.1
 
-Fixes
------
+### Fixes
 
 * remove unnecessary call to `bash` in `find --exec`
 
