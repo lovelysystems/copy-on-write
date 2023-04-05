@@ -1,12 +1,30 @@
-s#.*/(.*)\.(mp3)#music/\1\.\2#g
+# example for mapping with regex groups
+s#songs/artist_(.*)/(.*\.(mp3))#music/\1/\2#g
+
 s#^my_dir/#other_dir/#g
+# leaving out the splash works too
+# ATTENTION: watch out for unwanted chained mappings (see below)
 s#^no_slash_mapping#some_dir#g
+
+s#^empty_dir(.*)#mapped_dir/\1#g
+
+# source / target contains space
 s#^spacey dir/#not_so_spacey_target/#g
 s#^not_so_spacey/#spacey target/#g
-s#^my_other_dir/#also_another_dir/#g
+
+# special characters
 s#^stran"F%lder/#normalFolder/#g
 s#^someNormalFolder/#st"F%lder/#g
+s#^notStrangeFolder/#stranger$Folder/#g
+
+# nested directories
 s#nested/first/#first/#g
 s#nested/second/#second/#g
-s#^notStrangeFolder/#stranger$Folder/#g
+
+# folder that will be present on startup already
 s#^existBeforeStart/#mappedDuringStart/#g
+
+# ATTENTION, replacements are chained:
+# files put into /one will end up in /three
+s#^one/(.*)#two/\1#g
+s#^two/(.*)#three/\1#g
