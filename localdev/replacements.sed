@@ -2,7 +2,7 @@
 s#songs/artist_(.*)/(.*\.(mp3))#music/\1/\2#g
 
 s#^my_dir/#other_dir/#g
-# leaving out the splash works too
+# leaving out the slash works too
 # ATTENTION: watch out for unwanted chained mappings (see below)
 s#^no_slash_mapping#some_dir#g
 
@@ -23,6 +23,9 @@ s#nested/second/#second/#g
 
 # folder that will be present on startup already
 s#^existBeforeStart/#mappedDuringStart/#g
+
+# existing content won't get updated on start
+s#^update_test/#update_test_target/#g
 
 # ignore `.dot` files, map only mp3/json, create subdirectories
 s#^on_demand_(\w+)\/([^\.](.+\.(mp3|json)))#ondemand/\1/\2#g
