@@ -2,7 +2,7 @@
 s#songs/artist_(.*)/(.*\.(mp3))#music/\1/\2#g
 
 s#^my_dir/#other_dir/#g
-# leaving out the splash works too
+# leaving out the slash works too
 # ATTENTION: watch out for unwanted chained mappings (see below)
 s#^no_slash_mapping#some_dir#g
 

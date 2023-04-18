@@ -1,5 +1,21 @@
 #!/bin/sh
 
+# returns file modification in seconds since epoch
+mTime() {
+  filename=$1
+  if uname | grep -q "Darwin"; then
+      # stat bsd version
+      # %m mtime
+      # %c ctime
+      mod_time_fmt="-f %m"
+  else
+      # stat gnu version
+      # %Y time of last data modification, seconds since Epoch
+      # %W time of file birth, seconds since Epoch; 0 if unknown
+      mod_time_fmt="-c %Y"
+  fi
+  stat $mod_time_fmt $filename
+}
 
 
 #so that the script can be called from any directory
@@ -13,7 +29,7 @@ mkdir -p volumes/src/existBeforeStart
 mkdir -p volumes/src/existBeforeStart/empty
 echo "some content" > volumes/src/existBeforeStart/some.txt
 
-fileCTime=$(stat -f '%c' volumes/src/existBeforeStart/some.txt)
+fileMTime=$(mTime volumes/src/existBeforeStart/some.txt)
 
 echo "some other content" > "volumes/src/existBeforeStart/some spacey starter.txt"
 echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
@@ -74,7 +90,7 @@ mv floder folder
 echo "content in sub folder" > subFolder/file.txt
 echo "Hello ContentA" > contentA.txt
 
-contentAMTime=$(stat -f '%m' contentA.txt)
+contentAMTime=$(mTime "contentA.txt")
 echo "Some unimportant Content. " > "spacey contentWith $%strange.txt"
 echo "Some unimportant Content. more unimportant content" > "spacey contentWith $%strange.txt"
 cd ../"spacey dir"
@@ -144,7 +160,7 @@ fileShouldExistWithContent() {
 
 fileShouldExistWithContent "other_dir/contentA.txt" "Hello ContentA"
 
-actMTime=$(stat -f '%m' other_dir/contentA.txt)
+actMTime=$(mTime other_dir/contentA.txt)
 
 if [ "$contentAMTime" != "$actMTime" ]; then
   echo "ContentA should have mTime $contentAMTime but had $actMTime"
@@ -173,17 +189,18 @@ fileShouldExist "music/prince/purple rain.mp3"
 fileShouldExistWithContent "mappedDuringStart/some.txt" "some content"
 dirShouldNotExist "mappedDuringStart/empty"
 
-actCTime=$(stat -f '%c' mappedDuringStart/some.txt)
+actMTime=$(mTime mappedDuringStart/some.txt)
 earliestAllowedCTime=$((containerStartedTS))
 
-# the ctime of the copied file should be updated to now during the copy. That will happen after container has started
-if [ "$actCTime" -lt "$earliestAllowedCTime" ]; then
-  echo "CTime of mappedDuringStart/some.txt was earlier than allowed. CTime should be updated to the current time during copy. Which needs to be after the container has started"
+# the modification time of the copied file should be updated to now during the copy. That will happen after container has started
+if [ "$actMTime" -lt "$earliestAllowedCTime" ]; then
+  echo "mTime of mappedDuringStart/some.txt was earlier than allowed. mTime should be updated to the current time during copy. Which needs to be after the container has started"
+  echo "mapped: "  $actMTime + " / containerStart: "  $earliestAllowedCTime
   success="false"
 fi
-# ctime should have changed during copy
-if [ "$actCTime" = "$fileCTime" ]; then
-  echo "CTime of mappedDuringStart/some.txt should have been updated during copy, but was the same as on source file"
+# mtime should have changed during copy
+if [ "$actMTime" = "$fileMTime" ]; then
+  echo "mTime of mappedDuringStart/some.txt should have been updated during copy, but was the same as on source file"
   success="false"
 fi
 
