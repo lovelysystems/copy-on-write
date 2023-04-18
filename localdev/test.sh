@@ -31,10 +31,23 @@ echo "some content" > volumes/src/existBeforeStart/some.txt
 
 fileMTime=$(mTime volumes/src/existBeforeStart/some.txt)
 
+# create an existing file in source
+mkdir -p volumes/src/update_test
+echo "initial content" > volumes/src/update_test/file.txt
+echo "initial content" > volumes/src/update_test/file2.txt
+existingFileMTime=$(mTime volumes/src/update_test/file.txt)
+# copy with same attrs to destination directory
+mkdir -p volumes/target/update_test_target
+cp -a volumes/src/update_test/file.txt volumes/target/update_test_target/
+# source file will be updated before container is started and after 1 second sleep
+
 echo "some other content" > "volumes/src/existBeforeStart/some spacey starter.txt"
 echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
 sleep 1
+# update the update_test file (simulate an update of a previously copied file and a restart)
+echo "updated content" > volumes/src/update_test/file.txt
+
 docker compose up --build -d --wait
 containerStartedTS=$(date +%s)
 
@@ -204,9 +217,13 @@ if [ "$actMTime" = "$fileMTime" ]; then
   success="false"
 fi
 
-
 fileShouldExistWithContent "mappedDuringStart/some spacey starter.txt" "some other content"
 fileShouldExistWithContent "mappedDuringStart/some strange %'12&( starter.txt" "a"
+
+# the existing but updated file did not get re-copied on startup
+fileShouldExistWithContent "update_test_target/file.txt" "initial content"
+# a non-existing file got processed
+fileShouldExistWithContent "update_test_target/file2.txt" "initial content"
 
 # interim directories have been created
 dirShouldExist "ondemand/argovia"

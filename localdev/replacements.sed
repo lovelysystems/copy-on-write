@@ -24,6 +24,9 @@ s#nested/second/#second/#g
 # folder that will be present on startup already
 s#^existBeforeStart/#mappedDuringStart/#g
 
+# existing content won't get updated on start
+s#^update_test/#update_test_target/#g
+
 # ignore `.dot` files, map only mp3/json, create subdirectories
 s#^on_demand_(\w+)\/([^\.](.+\.(mp3|json)))#ondemand/\1/\2#g
 
