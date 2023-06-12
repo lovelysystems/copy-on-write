@@ -234,6 +234,15 @@ fileShouldExist "ondemand/argovia/C055AA93-BC24.json"
 fileShouldNotExist "ondemand/argovia/.in.C055AA93-BC24.json"
 fileShouldNotExist "ondemand/argovia/C055AA93-BC24.txt"
 
+# make sure watcher also recognizes files within subdirectories created after startup
+cd "$baseDir/volumes/src/existBeforeStart"
+mkdir "newsubdirectory"
+touch "newsubdirectory/newfile.txt"
+# allow some time for service to copy the file
+sleep 1s
+cd "$baseDir/volumes/target"
+fileShouldExist "mappedDuringStart/newsubdirectory/newfile.txt"
+
 cd "$baseDir"
 
 rm -rf volumes/src/*
