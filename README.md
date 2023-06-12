@@ -24,6 +24,6 @@ To test changes, tell compose to rebuild the image before startup: `docker compo
 - when a folder in the source directories is renamed a folder with the mapped name will not be created in target immediately.
 
   * On restart, the new folder and existing files will be copied.
-  * Howevers, the old folder in target will still exist (not get removed/renamed)
+  * However, the old folder in target will still exist (not get removed/renamed)
 
 - on linux test.sh needs to be run as root user (or docker/docker-compose configured to run with the current user)
