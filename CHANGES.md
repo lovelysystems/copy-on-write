@@ -1,5 +1,12 @@
 # Changes for copy-on-write
 
+## Unrelased
+
+### Breaking
+
+* Copy to `*.part` files and rename file when complete. This allows watchers to be sure
+  a file is complete when the `create` event is fired.
+
 ## 2023-04-18 / 1.2.0
 
 ### Breaking

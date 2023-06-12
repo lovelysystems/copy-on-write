@@ -7,6 +7,10 @@ Works based on regex substitution. See [replacements](localdev/replacements.sed)
 
 On startup existing files in SOURCE_ROOT are copied to target if mapped.
 
+To make sure a file that ends up in the target directory is complete, a `.part` extension is added and
+the file is renamed when copy has finished.
+Make sure to exclude `*.part` files when using watchers to process files in the target directory.
+
 See [localdev/docker-compose.yml](localdev/docker-compose.yml) for an example configuration.
 
 ## Tests

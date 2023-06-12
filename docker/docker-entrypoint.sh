@@ -44,7 +44,11 @@ function copyIfMapped {
     fi
 
     # cp will create all new timestamps for the new file
-    cp "$fullPath" "$TARGET_ROOT$replacedPath"
+    cp "$fullPath" "$TARGET_ROOT$replacedPath.part"
+    # copy to a *.part file and rename when complete to make sure
+    # watchers will process a complete file (create event is fired before file is complete)
+    mv "$TARGET_ROOT$replacedPath.part" "$TARGET_ROOT$replacedPath"
+
   fi
 }
 
