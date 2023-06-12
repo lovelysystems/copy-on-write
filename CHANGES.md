@@ -1,11 +1,15 @@
 # Changes for copy-on-write
 
-## Unrelased
+## 2023-06-12 / 1.3.0
 
 ### Breaking
 
 * Copy to `*.part` files and rename file when complete. This allows watchers to be sure
   a file is complete when the `create` event is fired.
+
+## Development
+
+- Update alpine 3.16.4 to 3.18.0
 
 ## 2023-04-18 / 1.2.0
 
