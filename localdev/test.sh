@@ -44,7 +44,7 @@ cp -a volumes/src/update_test/file.txt volumes/target/update_test_target/
 echo "some other content" > "volumes/src/existBeforeStart/some spacey starter.txt"
 echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
-sleep 1
+sleep 2
 # update the update_test file (simulate an update of a previously copied file and a restart)
 echo "updated content" > volumes/src/update_test/file.txt
 
