@@ -21,6 +21,7 @@ mTime() {
 #so that the script can be called from any directory
 originalWd=$(pwd)
 cd "$(dirname $0)"
+baseDir=$(pwd)
 trap 'cd $originalWd' EXIT
 
 docker compose down #incase
@@ -113,7 +114,7 @@ cd ../unmappedMusicFolder
 
 touch "unmapped spacey test.mp3"
 
-cd ../../target
+cd "$baseDir/volumes/target"
 
 sleep 1
 
@@ -233,7 +234,7 @@ fileShouldExist "ondemand/argovia/C055AA93-BC24.json"
 fileShouldNotExist "ondemand/argovia/.in.C055AA93-BC24.json"
 fileShouldNotExist "ondemand/argovia/C055AA93-BC24.txt"
 
-cd ../..
+cd "$baseDir"
 
 rm -rf volumes/src/*
 rm -rf volumes/target/*
