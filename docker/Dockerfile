@@ -1,5 +1,4 @@
-FROM alpine:3.16.5
-#do NOT upgrade alpine version, alpine 3.17.0, the version needed for inotify-tools isn't available
+FROM alpine:3.18.0
 RUN apk add --no-cache bash && apk add --no-cache inotify-tools
 
 COPY ./docker-entrypoint.sh /
