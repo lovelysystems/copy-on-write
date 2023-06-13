@@ -3,7 +3,7 @@ version: "3.9"
 services:
   copier:
     build: ../docker
-    environment:
+    environment: &copy-env
       SCRIPT_FILE_PATH: "/replacements.sed" # this is also the default value, to use a custom script mount it as volume and change this path
       SOURCE_ROOT: "/mnt/src/"
       TARGET_ROOT: "/mnt/target/"
@@ -16,12 +16,9 @@ services:
   copier-sha:
     build: ../docker
     environment:
-      SCRIPT_FILE_PATH: "/replacements.sed" # this is also the default value, to use a custom script mount it as volume and change this path
-      SOURCE_ROOT: "/mnt/src/"
-      TARGET_ROOT: "/mnt/target/"
-      # IMPORTANT: The "root" environment variables should end with a '/'
+      <<: *copy-env
       APPEND_SHA1_SUM: "true"
     volumes:
-      - ./replacements-sha.sed:/replacements.sed
       - ./volumes/src:/mnt/src
       - ./volumes/target:/mnt/target
+      - ./replacements-sha.sed:/replacements.sed
