@@ -1,8 +1,9 @@
 #!/bin/bash
 
 source "./testing.sh"
+source "./test_sha.sh"
 
-#so that the script can be called from any directory
+# so that the script can be called from any directory
 originalWd=$(pwd)
 cd "$(dirname $0)"
 baseDir=$(pwd)
@@ -10,6 +11,10 @@ trap 'cd $originalWd' EXIT
 
 docker compose down #incase
 
+beforeStartSHA
+cd $baseDir
+
+# XXX move setup and tests to dedicated file (similar to test_sha)
 mkdir -p volumes/src/existBeforeStart
 mkdir -p volumes/src/existBeforeStart/empty
 echo "some content" > volumes/src/existBeforeStart/some.txt
@@ -29,7 +34,7 @@ cp -a volumes/src/update_test/file.txt volumes/target/update_test_target/
 echo "some other content" > "volumes/src/existBeforeStart/some spacey starter.txt"
 echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
-sleep 2
+sleep 3
 # update the update_test file (simulate an update of a previously copied file and a restart)
 echo "updated content" > volumes/src/update_test/file.txt
 
@@ -42,9 +47,9 @@ sleep 2 # so the container has time do initial copying and initialize the watche
 
 
 success="true"
-cd volumes/src
+cd "$baseDir/volumes/src"
 
-#create files in src
+# create files in src
 mkdir my_dir
 mkdir no_slash_mapping
 touch no_slash_mapping/foo.txt
@@ -104,23 +109,6 @@ cd "$baseDir/volumes/target"
 
 sleep 1
 
-# check they exist in target
-
-dirShouldExist() {
-  path=$1
-  if [ ! -d "$path" ]; then
-    echo "$path should exist in target but didnt"
-    success="false"
-  fi
-}
-
-dirShouldNotExist() {
-  path=$1
-  if [ -d "$path" ]; then
-    echo "$path should not exist but exsits"
-    success="false"
-  fi
-}
 
 dirShouldExist "other_dir"
 dirShouldExist "some_dir"
@@ -135,28 +123,6 @@ dirShouldExist "stranger\$Folder"
 
 dirShouldExist "music"
 
-fileShouldExist() {
-  if [ ! -f "$1" ]; then
-    echo "File $1 should exist but didnt"
-    success="false"
-  fi
-}
-
-fileShouldNotExist() {
-  if [ -f "$1" ]; then
-    echo "File $1 should not exist but did"
-    success="false"
-  fi
-}
-
-fileShouldExistWithContent() {
-  fileShouldExist "$1"
-  contentAct=$(cat "$1")
-  if [ "$contentAct" != "$2" ]; then
-    echo "File $1 should have content $2 but had $contentAct"
-    success="false"
-  fi
-}
 
 fileShouldExistWithContent "other_dir/contentA.txt" "Hello ContentA"
 
@@ -166,6 +132,9 @@ if [ "$contentAMTime" != "$actMTime" ]; then
   echo "ContentA should have mTime $contentAMTime but had $actMTime"
   success="false"
 fi
+
+afterStartSHA
+
 
 # chained sed replacements
 dirShouldExist "three"
@@ -234,7 +203,7 @@ cd "$baseDir"
 rm -rf volumes/src/*
 rm -rf volumes/target/*
 
-docker compose down
+docker compose down -t 1
 
 if [ $success = "false" ]; then
   echo "Tests Failed"

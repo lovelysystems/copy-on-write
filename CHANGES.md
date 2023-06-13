@@ -1,5 +1,11 @@
 # Changes for copy-on-write
 
+## Unreleased
+
+### Feature
+
+* Added `APPEND_SHA1_SUM` option to append sha1 sum to filename
+
 ## 2023-06-12 / 1.3.0
 
 ### Breaking

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # returns file modification in seconds since epoch
-function mTime() {
+mTime() {
   filename=$1
   if uname | grep -q "Darwin"; then
       # stat bsd version
@@ -17,4 +17,46 @@ function mTime() {
   stat $mod_time_fmt $filename
 }
 
-export -f mTime
+
+# check they exist in target
+dirShouldExist() {
+  path=$1
+  if [ ! -d "$path" ]; then
+    echo "$path should exist in target but didn't"
+    success="false"
+  fi
+}
+
+dirShouldNotExist() {
+  path=$1
+  if [ -d "$path" ]; then
+    echo "$path should not exist but exists"
+    success="false"
+  fi
+}
+
+
+fileShouldExist() {
+  if [ ! -f "$1" ]; then
+    echo "File $1 should exist but didn't"
+    success="false"
+  fi
+}
+
+
+fileShouldNotExist() {
+  if [ -f "$1" ]; then
+    echo "File $1 should not exist but did"
+    success="false"
+  fi
+}
+
+
+fileShouldExistWithContent() {
+  fileShouldExist "$1"
+  contentAct=$(cat "$1")
+  if [ "$contentAct" != "$2" ]; then
+    echo "File $1 should have content $2 but had $contentAct"
+    success="false"
+  fi
+}
