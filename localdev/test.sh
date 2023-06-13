@@ -52,6 +52,8 @@ echo "updated content" > volumes/src/update_test/file.txt
 docker compose up --build -d --wait
 containerStartedTS=$(date +%s)
 
+# building can take more time on first run. -> flaky tests
+# however, we try to keep test-runs as fast as possible
 sleep 2 # so the container has time do initial copying and initialize the watches
 
 
