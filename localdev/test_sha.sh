@@ -2,7 +2,9 @@
 
 source "./testing.sh"
 
-## run before container has been started
+# XXX test and handle edge case: same file must not get overwritten (compare for existence with hash already)
+
+# run before container has been started
 beforeStartSHA() {
   cd "$baseDir/volumes/src"
   mkdir "sha_in"

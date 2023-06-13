@@ -5,6 +5,8 @@
 ### Feature
 
 * Added `APPEND_SHA1_SUM` option to append sha1 sum to filename
+* Added `DELETE_SOURCE_FILE` option to remove files after they have been copied
+  (Note that this requires write permissions on the source volume)
 
 ## 2023-06-12 / 1.3.0
 

@@ -1,8 +1,10 @@
 #!/bin/bash
 
-source "./testing.sh"
 source "./test_mapping.sh"
 source "./test_sha.sh"
+source "./test_delete.sh"
+
+PROJECT_NAME="copy_on_write_tests"
 
 # so that the script can be called from any directory
 originalWd=$(pwd)
@@ -10,15 +12,17 @@ cd "$(dirname $0)"
 baseDir=$(pwd)
 trap 'cd $originalWd' EXIT
 
-docker compose down #incase
+docker compose -p $PROJECT_NAME down # in case still up
 
-beforeStartSHA
 beforeStartMapping
+beforeStartSHA
+beforeStartDelete
 
+# wait one seconds to ensure a startuptime distinct to content created before startup
 sleep 1
-
-docker compose up --build -d --wait
 containerStartedTS=$(date +%s)
+
+docker compose -p $PROJECT_NAME up --build -d --wait
 
 sleep 1 # so the container has time do initial copying and initialize the watches
 
@@ -27,7 +31,7 @@ success="true"
 
 afterStartMapping
 afterStartSHA
-
+afterStartDelete
 
 # cleanup
 cd "$baseDir"
@@ -35,7 +39,7 @@ cd "$baseDir"
 rm -rf volumes/src/*
 rm -rf volumes/target/*
 
-docker compose down -t 0
+docker compose -p $PROJECT_NAME down -t 1
 
 if [ $success = "false" ]; then
   echo "Tests failed"

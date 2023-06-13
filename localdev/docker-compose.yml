@@ -10,7 +10,7 @@ services:
       # IMPORTANT: The "root" environment variables should end with a '/'
     volumes:
       - ./replacements.sed:/replacements.sed
-      - ./volumes/src:/mnt/src
+      - ./volumes/src:/mnt/src:ro
       - ./volumes/target:/mnt/target
 
   copier-sha:
@@ -19,6 +19,17 @@ services:
       <<: *copy-env
       APPEND_SHA1_SUM: "true"
     volumes:
-      - ./volumes/src:/mnt/src
+      - ./volumes/src:/mnt/src:ro
       - ./volumes/target:/mnt/target
       - ./replacements-sha.sed:/replacements.sed
+
+  copier-delete:
+    build: ../docker
+    environment:
+      <<: *copy-env
+      # ATTENTION: Requires write permissions on the source volume
+      DELETE_SOURCE_FILE: "true"
+    volumes:
+      - ./volumes/src:/mnt/src
+      - ./volumes/target:/mnt/target
+      - ./replacements-delete.sed:/replacements.sed

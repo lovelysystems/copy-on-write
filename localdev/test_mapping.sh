@@ -3,7 +3,7 @@
 source "./testing.sh"
 
 
-## run before container has been started
+# run before container has been started
 beforeStartMapping() {
   cd $baseDir
 
@@ -39,7 +39,7 @@ afterStartMapping() {
   cd "$baseDir/volumes/src"
 
   # create files in src
-  mkdir my_dir
+  mkdir -p my_dir
   mkdir no_slash_mapping
   touch no_slash_mapping/foo.txt
   mkdir empty_dir

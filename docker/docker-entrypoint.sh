@@ -58,6 +58,12 @@ function copyIfMapped {
     # watchers will process a complete file (create event is fired before file is complete)
     mv "$newFilename.part" "$newFilename"
 
+    # remove incoming file in case DELETE_SOURCE_FILE is true
+    if [[ "${DELETE_SOURCE_FILE:-false}" == "true" ]]; then
+      >&2 removing "$fullPath"
+      rm $fullPath
+    fi
+
   fi
 }
 
