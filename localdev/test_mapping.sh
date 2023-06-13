@@ -17,6 +17,7 @@ beforeStartMapping() {
   mkdir -p volumes/src/update_test
   echo "initial content" > volumes/src/update_test/file.txt
   echo "initial content" > volumes/src/update_test/file2.txt
+
   existingFileMTime=$(mTime volumes/src/update_test/file.txt)
   # copy with same attrs to destination directory
   mkdir -p volumes/target/update_test_target
@@ -26,7 +27,7 @@ beforeStartMapping() {
   echo "some other content" > "volumes/src/existBeforeStart/some spacey starter.txt"
   echo "a" > "volumes/src/existBeforeStart/some strange %'12&( starter.txt"
 
-  sleep 2
+  sleep 1
   # update the update_test file (simulate an update of a previously copied file and a restart)
   # to test existingFileMTime
   echo "updated content" > volumes/src/update_test/file.txt
@@ -143,12 +144,11 @@ afterStartMapping() {
   dirShouldNotExist "mappedDuringStart/empty"
 
   actMTime=$(mTime mappedDuringStart/some.txt)
-  earliestAllowedCTime=$((containerStartedTS))
 
   # the modification time of the copied file should be updated to now during the copy. That will happen after container has started
-  if [ "$actMTime" -lt "$earliestAllowedCTime" ]; then
+  if [ "$actMTime" -lt "$containerStartedTS" ]; then
     echo "mTime of mappedDuringStart/some.txt was earlier than allowed. mTime should be updated to the current time during copy. Which needs to be after the container has started"
-    echo "mapped: "  $actMTime + " / containerStart: "  $earliestAllowedCTime
+    echo "mapped: "  $actMTime + " / containerStart: "  $containerStartedTS
     success="false"
   fi
   # mtime should have changed during copy
@@ -160,8 +160,15 @@ afterStartMapping() {
   fileShouldExistWithContent "mappedDuringStart/some spacey starter.txt" "some other content"
   fileShouldExistWithContent "mappedDuringStart/some strange %'12&( starter.txt" "a"
 
-  # the existing but updated file did not get re-copied on startup
+  # the existing but updated file did not get re-copied on startup (still initial content)
   fileShouldExistWithContent "update_test_target/file.txt" "initial content"
+  # also the timestamp did not change
+  updateTestMTime=$(mTime update_test_target/file.txt)
+  if [ "$existingFileMTime" != "$updateTestMTime" ]; then
+    echo "mTime of update_test_target/file.txt should still be the initial modification time as the file did not get updated/touched"
+    success="false"
+  fi
+
   # a non-existing file got processed
   fileShouldExistWithContent "update_test_target/file2.txt" "initial content"
 

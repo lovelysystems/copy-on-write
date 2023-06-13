@@ -15,11 +15,11 @@ docker compose down #incase
 beforeStartSHA
 beforeStartMapping
 
+sleep 1
+
 docker compose up --build -d --wait
 containerStartedTS=$(date +%s)
 
-# building can take more time on first run. -> flaky tests
-# however, we try to keep test-runs as fast as possible
 sleep 1 # so the container has time do initial copying and initialize the watches
 
 # shared by all test. set to false to make test fail
@@ -39,6 +39,7 @@ docker compose down -t 0
 
 if [ $success = "false" ]; then
   echo "Tests failed"
+  echo "Note that tests related to modification-time are flaky. Run again in case tests for timestamps fail"
 else
   echo "Successfully ran tests"
 fi
