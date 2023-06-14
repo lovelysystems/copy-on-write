@@ -33,9 +33,8 @@ function copyIfMapped {
     return
   fi
 
+  # FIXME: limitation: we can't map src/foo to target/foo currently (as paths would not differ)
   if [[ "$originalPath" != "$replacedPath" ]]; then
-
-    >&2 echo "copying $fullPath to $TARGET_ROOT$replacedPath"
 
     directory="$(dirname "$TARGET_ROOT$replacedPath")"
     if [[ ! -d "$directory" ]]; then
@@ -43,11 +42,34 @@ function copyIfMapped {
       mkdir -p "$directory"
     fi
 
+    newFilename="$TARGET_ROOT$replacedPath"
+
+    # append sha1 sum before file extension
+    if [[ "${APPEND_SHA1_SUM:-false}" == "true" ]]; then
+      sha=$(sha1sum $fullPath | cut -d " " -f 1)
+      # foo.txt -> foo-e1d35a6f7182bfbac1c45f6bfdc12419e06e8d59.txt
+      newFilename=$(echo $newFilename | sed "s/\.[^.]*$/-$sha&/")
+
+      # to not copy file if it already exists
+      if [ -f "$newFilename" ]; then
+        # do not overwrite existing files, just skip them
+        return
+      fi
+    fi
+
+    >&2 echo "copying $fullPath to $newFilename"
+
     # cp will create all new timestamps for the new file
-    cp "$fullPath" "$TARGET_ROOT$replacedPath.part"
+    cp "$fullPath" "$newFilename.part"
     # copy to a *.part file and rename when complete to make sure
     # watchers will process a complete file (create event is fired before file is complete)
-    mv "$TARGET_ROOT$replacedPath.part" "$TARGET_ROOT$replacedPath"
+    mv "$newFilename.part" "$newFilename"
+
+    # remove incoming file in case DELETE_SOURCE_FILE is true
+    if [[ "${DELETE_SOURCE_FILE:-false}" == "true" ]]; then
+      >&2 echo "removing $fullPath"
+      rm $fullPath
+    fi
 
   fi
 }
