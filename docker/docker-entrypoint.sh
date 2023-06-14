@@ -33,6 +33,7 @@ function copyIfMapped {
     return
   fi
 
+  # FIXME: limitation: we can't map src/foo to target/foo currently (as paths would not differ)
   if [[ "$originalPath" != "$replacedPath" ]]; then
 
     directory="$(dirname "$TARGET_ROOT$replacedPath")"
@@ -48,6 +49,12 @@ function copyIfMapped {
       sha=$(sha1sum $fullPath | cut -d " " -f 1)
       # foo.txt -> foo-e1d35a6f7182bfbac1c45f6bfdc12419e06e8d59.txt
       newFilename=$(echo $newFilename | sed "s/\.[^.]*$/-$sha&/")
+
+      # to not copy file if it already exists
+      if [ -f "$newFilename" ]; then
+        # do not overwrite existing files, just skip them
+        return
+      fi
     fi
 
     >&2 echo "copying $fullPath to $newFilename"
@@ -60,7 +67,7 @@ function copyIfMapped {
 
     # remove incoming file in case DELETE_SOURCE_FILE is true
     if [[ "${DELETE_SOURCE_FILE:-false}" == "true" ]]; then
-      >&2 removing "$fullPath"
+      >&2 echo "removing $fullPath"
       rm $fullPath
     fi
 
