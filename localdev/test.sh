@@ -6,13 +6,22 @@ source "./test_delete.sh"
 
 PROJECT_NAME="copy_on_write_tests"
 
+cleanup() {
+  docker compose -p $PROJECT_NAME down -t 1
+
+  cd "$baseDir"
+  rm -rf volumes/src/*
+  rm -rf volumes/target/*
+}
+
 # so that the script can be called from any directory
 originalWd=$(pwd)
 cd "$(dirname $0)"
 baseDir=$(pwd)
 trap 'cd $originalWd' EXIT
 
-docker compose -p $PROJECT_NAME down # in case still up
+# cleanup before tests (in case previous test run has not finished)
+cleanup
 
 beforeStartMapping
 beforeStartSHA
@@ -33,13 +42,7 @@ afterStartMapping
 afterStartSHA
 afterStartDelete
 
-# cleanup
-cd "$baseDir"
-
-rm -rf volumes/src/*
-rm -rf volumes/target/*
-
-docker compose -p $PROJECT_NAME down -t 1
+cleanup
 
 if [ $success = "false" ]; then
   echo "Tests failed"
