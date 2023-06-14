@@ -28,19 +28,9 @@ function copyIfMapped {
   originalPath=${fullPath#"$SOURCE_ROOT"}
   replacedPath=$(echo "$originalPath" | sed -r -f "${SCRIPT_FILE_PATH:-"replacements.sed"}")
 
-  if [ -f "$TARGET_ROOT$replacedPath" ]; then
-    # do not overwrite existing files, just skip them
-    return
-  fi
 
   # FIXME: limitation: we can't map src/foo to target/foo currently (as paths would not differ)
   if [[ "$originalPath" != "$replacedPath" ]]; then
-
-    directory="$(dirname "$TARGET_ROOT$replacedPath")"
-    if [[ ! -d "$directory" ]]; then
-      >&2 echo "creating intermediate directories for $directory"
-      mkdir -p "$directory"
-    fi
 
     newFilename="$TARGET_ROOT$replacedPath"
 
@@ -49,16 +39,21 @@ function copyIfMapped {
       sha=$(sha1sum $fullPath | cut -d " " -f 1)
       # foo.txt -> foo-e1d35a6f7182bfbac1c45f6bfdc12419e06e8d59.txt
       newFilename=$(echo $newFilename | sed "s/\.[^.]*$/-$sha&/")
+    fi
 
-      # to not copy file if it already exists
-      if [ -f "$newFilename" ]; then
-        # do not overwrite existing files, just skip them
-        return
-      fi
+    # to not copy file if it already exists
+    if [ -f "$newFilename" ]; then
+      return
+    fi
+
+    # create itermediate directories if necessary
+    directory="$(dirname "$TARGET_ROOT$replacedPath")"
+    if [[ ! -d "$directory" ]]; then
+      >&2 echo "creating intermediate directories for $directory"
+      mkdir -p "$directory"
     fi
 
     >&2 echo "copying $fullPath to $newFilename"
-
     # cp will create all new timestamps for the new file
     cp "$fullPath" "$newFilename.part"
     # copy to a *.part file and rename when complete to make sure
