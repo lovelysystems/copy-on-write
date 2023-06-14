@@ -25,9 +25,15 @@ To test changes, tell compose to rebuild the image before startup: `docker compo
 
 - existing files (matching name) won't get updated (file content/metadata is not compared)
 
+- currently it is not possible to map a file from `$SOURCE/my_dir` to `$TARGET/my_dir`.
+  (the file path relative to source and target directory must be distinct in order to copy a file)
+
 - when a folder in the source directories is renamed a folder with the mapped name will not be created in target immediately.
 
   * On restart, the new folder and existing files will be copied.
   * However, the old folder in target will still exist (not get removed/renamed)
+
+- SED processes all rules in the configuration file sequentially which could result in chained mappings.
+  make sure to use regular expressions specific enough (e.g. by using `^start_of_string`)
 
 - on linux test.sh needs to be run as root user (or docker/docker-compose configured to run with the current user)

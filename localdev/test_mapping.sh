@@ -2,6 +2,19 @@
 
 source "./testing.sh"
 
+chainSetup() {
+    mkdir one
+    touch one/foo.txt
+}
+
+chainTest() {
+    # currently replacements are chained, only the final directory is created/mapped
+    # note that this is rather a limitation than a feature and might be fixed in future releases
+    fileShouldExist "three/foo.txt"
+    dirShouldExist "three"
+    dirShouldNotExist "two"
+    dirShouldNotExist "one"
+}
 
 # run before container has been started
 beforeStartMapping() {
@@ -63,8 +76,7 @@ afterStartMapping() {
   mkdir notStrangeFolder
   touch notStrangeFolder/foo.txt
 
-  mkdir one
-  touch one/foo.txt
+  chainSetup
 
   mkdir -p songs/artist_prince
   touch "songs/artist_prince/purple rain.mp3"
@@ -120,11 +132,7 @@ afterStartMapping() {
     success="false"
   fi
 
-
-  # chained sed replacements
-  dirShouldExist "three"
-  dirShouldNotExist "two"
-  dirShouldNotExist "one"
+  chainTest
 
   # the folder with type in its name that got renamed, still exists in the target
   fileShouldExistWithContent "other_dir/floder/stuff.txt" "content in folder with typo"
