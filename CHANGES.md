@@ -1,6 +1,6 @@
 # Changes for copy-on-write
 
-## Unreleased
+## 2023-06-14 / 1.4.0
 
 ### Feature
 
