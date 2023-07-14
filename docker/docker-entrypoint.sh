@@ -41,7 +41,7 @@ function copyIfMapped {
       newFilename=$(echo $newFilename | sed "s/\.[^.]*$/-$sha&/")
     fi
 
-    # to not copy file if it already exists
+    # do not copy file if it already exists
     if [ -f "$newFilename" ]; then
       return
     fi
