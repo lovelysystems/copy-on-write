@@ -1,5 +1,12 @@
 # Changes for copy-on-write
 
+## Unreleased
+
+### Fix
+
+* Do not process files while they are written to
+  (listen to inotifywait `close_write` event instead of `create`)
+
 ## 2023-06-14 / 1.4.0
 
 ### Feature

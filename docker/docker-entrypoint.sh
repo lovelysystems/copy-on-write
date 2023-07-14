@@ -79,8 +79,10 @@ find "$SOURCE_ROOT" -type f -exec bash -c 'copyIfMapped "{}"' \;
 >&2 echo "Watching for updates in $SOURCE_ROOT"
 
 
-#do NOT include the "open" event, copy command will trigger a open event -> resulting in an endless loop
-inotifywait -mr "$SOURCE_ROOT" -e moved_to -e create -e modify --format '%w%f' |
+# do NOT include the "open" event, copy command will trigger a open event -> resulting in an endless loop
+# close_write (`touch src/foo.txt` | `mv somewhere/foo.txt src` | `cp somewhere/foo.txt src`)
+# moved_to needed for `mv src/.in.foo.txt src/foo.txt`
+inotifywait -mr "$SOURCE_ROOT" -e moved_to -e close_write --format '%w%f' |
   while read -r fullPath; do
     copyIfMapped "$fullPath"
   done

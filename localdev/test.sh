@@ -3,6 +3,7 @@
 source "./test_mapping.sh"
 source "./test_sha.sh"
 source "./test_delete.sh"
+source "./test_events.sh"
 
 PROJECT_NAME="copy_on_write_tests"
 
@@ -35,12 +36,17 @@ docker compose -p $PROJECT_NAME up --build -d --wait
 
 sleep 1 # so the container has time do initial copying and initialize the watches
 
-# shared by all test. set to false to make test fail
+# shared by all tests. set to false to make test fail
 success="true"
 
 afterStartMapping
 afterStartSHA
 afterStartDelete
+afterStartEvents
+
+sleep 1
+
+afterSleepEvents
 
 cleanup
 
