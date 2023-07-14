@@ -34,3 +34,5 @@ s#^on_demand_(\w+)\/([^\.](.+\.(mp3|json)))#ondemand/\1/\2#g
 # files put into /one will end up in /three
 s#^one/(.*)#two/\1#g
 s#^two/(.*)#three/\1#g
+
+s#events_in/#events_out/#g
