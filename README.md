@@ -6,6 +6,8 @@ All timestamps will be set to now during the copy, no timestamps are preserved. 
 Works based on regex substitution. See [replacements](localdev/replacements.sed) for an example mapping.
 
 On startup existing files in SOURCE_ROOT are copied to target if mapped.
+You can use `INITIAL_FIND_PARAMS` (GNU find parameters) to further limit the files copied initially:
+Eg `INITIAL_FIND_PARAMS='-mtime -2'` to only copy files modified less than 2*24 hours ago.
 
 To make sure a file that ends up in the target directory is complete, a `.part` extension is added and
 the file is renamed when copy has finished.

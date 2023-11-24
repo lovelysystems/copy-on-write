@@ -33,3 +33,13 @@ services:
       - ./volumes/src:/mnt/src
       - ./volumes/target:/mnt/target
       - ./replacements-delete.sed:/replacements.sed
+
+  copier-initial:
+    build: ../docker
+    environment:
+      <<: *copy-env
+      INITIAL_FIND_PARAMS: '-iname "include*"'
+    volumes:
+      - ./volumes/src:/mnt/src
+      - ./volumes/target:/mnt/target
+      - ./replacements-initial.sed:/replacements.sed
