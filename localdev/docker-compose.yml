@@ -38,8 +38,8 @@ services:
     build: ../docker
     environment:
       <<: *copy-env
-      INITIAL_FIND_PARAMS: '-iname "include*"'
+      INITIAL_FIND_PARAMS: "-iname include*"
     volumes:
-      - ./volumes/src:/mnt/src
+      - ./volumes/src:/mnt/src:ro
       - ./volumes/target:/mnt/target
       - ./replacements-initial.sed:/replacements.sed
