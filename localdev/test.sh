@@ -4,6 +4,7 @@ source "./test_mapping.sh"
 source "./test_sha.sh"
 source "./test_delete.sh"
 source "./test_events.sh"
+source "./test_initial_find.sh"
 
 PROJECT_NAME="copy_on_write_tests"
 
@@ -27,6 +28,7 @@ cleanup
 beforeStartMapping
 beforeStartSHA
 beforeStartDelete
+beforeStartInitialFind
 
 # wait one seconds to ensure a startuptime distinct to content created before startup
 sleep 1
@@ -43,6 +45,7 @@ afterStartMapping
 afterStartSHA
 afterStartDelete
 afterStartEvents
+afterStartInitialFind
 
 sleep 1
 

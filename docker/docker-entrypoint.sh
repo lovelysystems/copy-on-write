@@ -19,6 +19,7 @@ fi
 
 function copyIfMapped {
   fullPath=$1
+  >&2 echo "processing $fullPath"
 
   # do not handle directories at all
   if [ -d "$fullPath" ]; then
@@ -71,10 +72,15 @@ function copyIfMapped {
 
 export -f copyIfMapped
 
->&2 echo "Searching for mapped files and directories in $SOURCE_ROOT"
+>&2 echo "Searching for mapped files and directories in $SOURCE_ROOT (find params: '$INITIAL_FIND_PARAMS')"
 >&2 echo "Checking `find $SOURCE_ROOT | wc -l` items..."
 
-find "$SOURCE_ROOT" -type f -exec bash -c 'copyIfMapped "{}"' \;
+# parse parameters into array (see https://stackoverflow.com/a/45201229)
+# to be able to pass them to the command (see https://unix.stackexchange.com/a/459369)
+readarray -td' ' find_params <<<"$INITIAL_FIND_PARAMS "; unset 'find_params[-1]';
+# limitation: this won't work for "INITIAL_FIND_PARAMS="-iname 'include*'". "-iname include*" will work
+
+find "$SOURCE_ROOT" ${find_params[@]} -type f -exec bash -c 'copyIfMapped "{}"' \;
 
 >&2 echo "Watching for updates in $SOURCE_ROOT"
 

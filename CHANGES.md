@@ -1,5 +1,11 @@
 # Changes for copy-on-write
 
+## Unreleased
+
+### Feature
+
+* Add `INITIAL_FIND_PARAMS` option to parameterize the initial find before starting the watcher
+
 ## 2023-07-14 / 1.4.1
 
 ### Fix
