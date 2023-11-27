@@ -19,7 +19,6 @@ fi
 
 function copyIfMapped {
   fullPath=$1
-  >&2 echo "processing $fullPath"
 
   # do not handle directories at all
   if [ -d "$fullPath" ]; then
